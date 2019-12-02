@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Matthew\\source\\repos\\AOC_2019\\Day1\\Day1.csproj": {}
+    "C:\\Users\\Matthew\\Source\\Repos\\AOC_2019\\Day1\\Day1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Matthew\\source\\repos\\AOC_2019\\Day1\\Day1.csproj": {
+    "C:\\Users\\Matthew\\Source\\Repos\\AOC_2019\\Day1\\Day1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Matthew\\source\\repos\\AOC_2019\\Day1\\Day1.csproj",
+        "projectUniqueName": "C:\\Users\\Matthew\\Source\\Repos\\AOC_2019\\Day1\\Day1.csproj",
         "projectName": "Day1",
-        "projectPath": "C:\\Users\\Matthew\\source\\repos\\AOC_2019\\Day1\\Day1.csproj",
+        "projectPath": "C:\\Users\\Matthew\\Source\\Repos\\AOC_2019\\Day1\\Day1.csproj",
         "packagesPath": "C:\\Users\\Matthew\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Matthew\\source\\repos\\AOC_2019\\Day1\\obj\\",
+        "outputPath": "C:\\Users\\Matthew\\Source\\Repos\\AOC_2019\\Day1\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
