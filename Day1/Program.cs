@@ -9,7 +9,7 @@ namespace Day1
         static ArrayList lines = new ArrayList();
         static ArrayList mass = new ArrayList();
         static int _TOTAL_FUEL = 0;
-        static string _FILE = @"C:\Users\Matthew\source\repos\AOC_2019\Day1\input.csv";
+        static string _FILE = "input.csv";
         static void Main(string[] args)
         {
             Parse_Input();
@@ -53,7 +53,7 @@ namespace Day1
 
         static void Parse_Input()
         {
-            using (StreamReader reader = new StreamReader(_FILE))
+            using (StreamReader reader = new StreamReader(Path.GetFullPath(_FILE)))
             {
                 while (!reader.EndOfStream)
                 {
