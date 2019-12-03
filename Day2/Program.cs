@@ -7,6 +7,7 @@ namespace Day2
     class Program
     {
         static string _FILE = "input.csv";
+        static int _EXPECTED = 19690720;
         static int[] opcode;
         static ArrayList read = new ArrayList();
 
@@ -91,14 +92,5 @@ namespace Day2
                 }
             }
         }
-    }
-
-    struct OPCODE
-    {
-        int
-            INSTRUCTION,
-            DATA_1,
-            DATA_2,
-            RESULT;
     }
 }
