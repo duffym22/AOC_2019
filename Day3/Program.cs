@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Day3
@@ -7,10 +9,13 @@ namespace Day3
     class Program
     {
         static string _FILE = "input.csv";
-        static int _MAX_SIZE = 48000;
         static int _ORIGIN = 24000;
+        static int _SMALLEST_MHD = 24000;
+        static int _SMALLEST_STEPS = 500000;
         static ArrayList read = new ArrayList();
         static ArrayList intersectPts = new ArrayList();
+        static List<Tuple<int, int, int>> wire1_Steps = new List<Tuple<int, int, int>>();
+        static List<Tuple<int, int, int>> wire2_Steps = new List<Tuple<int, int, int>>();
         static string[] wire1;
         static string[] wire2;
 
@@ -24,11 +29,13 @@ namespace Day3
                 wire2_L_MAX = 0,
                 wire2_D_MAX = 0;
 
-        static bool[,] wire1_grid = new bool[_MAX_SIZE, _MAX_SIZE];
-        static bool[,] wire2_grid = new bool[_MAX_SIZE, _MAX_SIZE];
+        static List<Tuple<int, int>> wire1_grid = new List<Tuple<int, int>>();
+        static List<Tuple<int, int>> wire2_grid = new List<Tuple<int, int>>();
 
         static void Main(string[] args)
         {
+            Stopwatch tmr = new Stopwatch();
+            tmr.Start();
             Read_Input();
             Parse_Input();
             Determine_Largest_Value(wire1, out wire1_U_MAX, out wire1_R_MAX, out wire1_D_MAX, out wire1_L_MAX);
@@ -38,34 +45,171 @@ namespace Day3
 
             Plot_Grid(wire1, wire1_grid);
             Plot_Grid(wire2, wire2_grid);
-            GC.Collect();
 
             Determine_Intersects(wire1_grid, wire2_grid);
-            GC.Collect();
+
+            //Took too long to calculate intersects (20 mins) - these are the intersects for the puzzle input
+            //intersectPts = new ArrayList()
+            //{
+            //    new Tuple<int, int>(24284, 22401),
+            //    new Tuple<int, int>(23988, 22386),
+            //    new Tuple<int, int>(23988, 22203),
+            //    new Tuple<int, int>(24797, 22866),
+            //    new Tuple<int, int>(25091, 22866),
+            //    new Tuple<int, int>(24516, 22680),
+            //    new Tuple<int, int>(24209, 22401),
+            //    new Tuple<int, int>(23988, 22075),
+            //    new Tuple<int, int>(24276, 22401),
+            //    new Tuple<int, int>(24276, 22171),
+            //    new Tuple<int, int>(24231, 21963),
+            //    new Tuple<int, int>(23988, 21963),
+            //    new Tuple<int, int>(22284, 21795),
+            //    new Tuple<int, int>(22810, 21495),
+            //    new Tuple<int, int>(22810, 21385),
+            //    new Tuple<int, int>(22710, 20707),
+            //    new Tuple<int, int>(22710, 20520),
+            //    new Tuple<int, int>(21528, 19579),
+            //    new Tuple<int, int>(21528, 19719),
+            //};
             Determine_Manhattan_Distance();
+            Console.WriteLine(_SMALLEST_MHD);
+
+            Calculate_Shortest_Steps(wire1, wire1_Steps);
+            Calculate_Shortest_Steps(wire2, wire2_Steps);
+
+            Determine_Fewest_Steps();
+            Console.WriteLine(_SMALLEST_STEPS);
+            tmr.Stop();
+            Console.WriteLine(string.Format("Total elapsed: {0}", tmr.Elapsed.ToString()));
+
             Console.ReadLine();
         }
 
-        private static void Determine_Manhattan_Distance()
+        private static void Determine_Fewest_Steps()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < wire1_Steps.Count; i++)
+            {
+                if (wire1_Steps[i].Item3 + wire2_Steps[i].Item3 < _SMALLEST_STEPS)
+                {
+                    _SMALLEST_STEPS = wire1_Steps[i].Item3 + wire2_Steps[i].Item3;
+                }
+            }
         }
 
-        private static void Determine_Intersects(bool[,] grid1, bool[,] grid2)
+        private static void Calculate_Shortest_Steps(string[] wire, List<Tuple<int, int, int>> stepper)
         {
-            for (int i = 0; i < _MAX_SIZE; i++)
+            bool
+                quit = false;
+
+            int
+                steps = 0,
+                gridX = _ORIGIN,
+                gridY = _ORIGIN;
+
+            foreach (Tuple<int, int> item in intersectPts)
             {
-                for (int j = 0; j < _MAX_SIZE; j++)
+                quit = false;
+                steps = 0;
+                gridX = _ORIGIN;
+                gridY = _ORIGIN;
+                foreach (string item2 in wire)
                 {
-                    if(grid1[i,j] == true && grid2[i,j] == true)
+                    if (!quit)
                     {
-                        intersectPts.Add(string.Format("{0},{1}", i, j));
+                        string dir = item2.Substring(0, 1);
+                        int.TryParse(item2.Substring(1, item2.Length - 1), out int dist);
+
+                        switch (dir.ToUpper())
+                        {
+                            case "U":
+                                for (int i = 0; i < dist; i++)
+                                {
+                                    gridY++;
+                                    steps++;
+                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
+                                    if (t.Equals(item))
+                                    {
+                                        stepper.Add(new Tuple<int, int, int>(gridX, gridY, steps));
+                                        quit = true;
+                                    }
+                                }
+                                break;
+                            case "D":
+                                for (int i = 0; i < dist; i++)
+                                {
+                                    gridY--;
+                                    steps++;
+                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
+                                    if (t.Equals(item))
+                                    {
+                                        stepper.Add(new Tuple<int, int, int>(gridX, gridY, steps));
+                                        quit = true;
+                                        break;
+                                    }
+                                }
+                                break;
+                            case "L":
+                                for (int i = 0; i < dist; i++)
+                                {
+                                    gridX--;
+                                    steps++;
+                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
+                                    if (t.Equals(item))
+                                    {
+                                        stepper.Add(new Tuple<int, int, int>(gridX, gridY, steps));
+                                        quit = true;
+                                    }
+                                }
+                                break;
+                            case "R":
+                                for (int i = 0; i < dist; i++)
+                                {
+                                    gridX++;
+                                    steps++;
+                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
+                                    if (t.Equals(item))
+                                    {
+                                        stepper.Add(new Tuple<int, int, int>(gridX, gridY, steps));
+                                        quit = true;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }
         }
 
-        private static void Plot_Grid(string[] wire, bool[,] grid)
+        private static void Determine_Manhattan_Distance()
+        {
+            foreach (Tuple<int, int> item in intersectPts)
+            {
+                int MD = Math.Abs(item.Item1 - _ORIGIN) + Math.Abs(item.Item2 - _ORIGIN);
+                if (MD < _SMALLEST_MHD)
+                {
+                    _SMALLEST_MHD = MD;
+                    Console.WriteLine(string.Format("Pt 1: {0} | Pt 2: {1} | MD: {2}", item.Item1, item.Item2, _SMALLEST_MHD));
+                }
+            }
+        }
+
+        private static void Determine_Intersects(List<Tuple<int, int>> grid1, List<Tuple<int, int>> grid2)
+        {
+            for (int i = 0; i < grid1.Count; i++)
+            {
+                for (int j = 0; j < grid2.Count; j++)
+                {
+                    if (grid1[i].Equals(grid2[j]))
+                        intersectPts.Add(grid2[j]);
+                }
+            }
+        }
+
+        private static void Plot_Grid(string[] wire, List<Tuple<int, int>> grid)
         {
             int
                 gridX = _ORIGIN,
@@ -82,28 +226,28 @@ namespace Day3
                         for (int i = 0; i < dist; i++)
                         {
                             gridY++;
-                            grid[gridX, gridY] = true;
+                            grid.Add(new Tuple<int, int>(gridX, gridY));
                         }
                         break;
                     case "D":
                         for (int i = 0; i < dist; i++)
                         {
                             gridY--;
-                            grid[gridX, gridY] = true;
+                            grid.Add(new Tuple<int, int>(gridX, gridY));
                         }
                         break;
                     case "L":
                         for (int i = 0; i < dist; i++)
                         {
                             gridX--;
-                            grid[gridX, gridY] = true;
+                            grid.Add(new Tuple<int, int>(gridX, gridY));
                         }
                         break;
                     case "R":
                         for (int i = 0; i < dist; i++)
                         {
                             gridX++;
-                            grid[gridX, gridY] = true;
+                            grid.Add(new Tuple<int, int>(gridX, gridY));
                         }
                         break;
                 }
