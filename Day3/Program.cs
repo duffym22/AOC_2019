@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
-using System.Linq;
 
 namespace Day3
 {
@@ -14,7 +14,9 @@ namespace Day3
         static int _SMALLEST_MHD = 24000;
         static int _SMALLEST_STEPS = 500000;
         static ArrayList read = new ArrayList();
-        static HashSet<string> ans;
+        static HashSet<Point> ans;
+        static HashSet<Point> wire1_grid = new HashSet<Point>();
+        static HashSet<Point> wire2_grid = new HashSet<Point>();
         static List<int> wire1_Steps = new List<int>();
         static List<int> wire2_Steps = new List<int>();
         static string[] wire1;
@@ -30,8 +32,6 @@ namespace Day3
                 wire2_L_MAX = 0,
                 wire2_D_MAX = 0;
 
-        static HashSet<string> wire1_grid = new HashSet<string>();
-        static HashSet<string> wire2_grid = new HashSet<string>();
 
         static void Main(string[] args)
         {
@@ -47,17 +47,31 @@ namespace Day3
             Plot_Grid(wire2, wire2_grid);
             Determine_Intersects(wire1_grid, wire2_grid);
             Determine_Manhattan_Distance();
-            Console.WriteLine(_SMALLEST_MHD);
-
             Calculate_Shortest_Steps(wire1, wire1_Steps);
             Calculate_Shortest_Steps(wire2, wire2_Steps);
-
             Determine_Fewest_Steps();
-            Console.WriteLine(_SMALLEST_STEPS);
             tmr.Stop();
-            Console.WriteLine(string.Format("Total elapsed: {0}", tmr.Elapsed.ToString()));
+            Console.WriteLine(_SMALLEST_MHD);
+            Console.WriteLine(_SMALLEST_STEPS);
+            Console.WriteLine();
+            Display_Runtime(tmr);
 
             Console.ReadLine();
+        }
+
+        private static void Display_Runtime(Stopwatch tmr)
+        {
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "Days", tmr.Elapsed.Days));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "Hours", tmr.Elapsed.Hours));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "Minutes", tmr.Elapsed.Minutes));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "Seconds", tmr.Elapsed.Seconds));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "Milliseconds", tmr.Elapsed.Milliseconds));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "Ticks", tmr.Elapsed.Ticks));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "TotalDays", tmr.Elapsed.TotalDays));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "TotalHours", tmr.Elapsed.TotalHours));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "TotalMinutes", tmr.Elapsed.TotalMinutes));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "TotalSeconds", tmr.Elapsed.TotalSeconds));
+            Console.WriteLine(string.Format("{0,-20}:{1,22}", "TotalMilliseconds", tmr.Elapsed.TotalMilliseconds));
         }
 
         private static void Determine_Fewest_Steps()
@@ -81,12 +95,9 @@ namespace Day3
                 gridX = _ORIGIN,
                 gridY = _ORIGIN;
 
-            foreach (string item in ans)
+            foreach (Point item in ans)
             {
-                string[] sp = item.Split(',');
-                int.TryParse(sp[0], out int x);
-                int.TryParse(sp[1], out int y);
-                Tuple<int, int> intersectionPt = new Tuple<int, int>(x, y);
+                Point intersectionPt = new Point(item.X, item.Y);
 
                 quit = false;
                 steps = 0;
@@ -106,8 +117,7 @@ namespace Day3
                                 {
                                     gridY++;
                                     steps++;
-                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
-                                    if (t.Equals(intersectionPt))
+                                    if (intersectionPt.Equals(new Point(gridX, gridY)))
                                     {
                                         stepper.Add(steps);
                                         quit = true;
@@ -120,8 +130,7 @@ namespace Day3
                                 {
                                     gridY--;
                                     steps++;
-                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
-                                    if (t.Equals(intersectionPt))
+                                    if (intersectionPt.Equals(new Point(gridX, gridY)))
                                     {
                                         stepper.Add(steps);
                                         quit = true;
@@ -134,8 +143,7 @@ namespace Day3
                                 {
                                     gridX--;
                                     steps++;
-                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
-                                    if (t.Equals(intersectionPt))
+                                    if (intersectionPt.Equals(new Point(gridX, gridY)))
                                     {
                                         stepper.Add(steps);
                                         quit = true;
@@ -148,8 +156,7 @@ namespace Day3
                                 {
                                     gridX++;
                                     steps++;
-                                    Tuple<int, int> t = new Tuple<int, int>(gridX, gridY);
-                                    if (t.Equals(intersectionPt))
+                                    if (intersectionPt.Equals(new Point(gridX, gridY)))
                                     {
                                         stepper.Add(steps);
                                         quit = true;
@@ -169,23 +176,20 @@ namespace Day3
 
         private static void Determine_Manhattan_Distance()
         {
-            foreach (string item in ans)
+            foreach (Point item in ans)
             {
-                string[] sp = item.Split(',');
-                int.TryParse(sp[0], out int x);
-                int.TryParse(sp[1], out int y);
-                int MD = Math.Abs(x - _ORIGIN) + Math.Abs(y - _ORIGIN);
+                int MD = Math.Abs(item.X - _ORIGIN) + Math.Abs(item.Y - _ORIGIN);
                 if (MD < _SMALLEST_MHD)
                 {
                     _SMALLEST_MHD = MD;
-                    Console.WriteLine(string.Format("Pt 1: {0} | Pt 2: {1} | MD: {2}", x, y, _SMALLEST_MHD));
+                    //Console.WriteLine(string.Format("Pt 1: {0} | Pt 2: {1} | MD: {2}", x, y, _SMALLEST_MHD));
                 }
             }
         }
 
-        private static void Determine_Intersects(HashSet<string> grid1, HashSet<string> grid2)
+        private static void Determine_Intersects(HashSet<Point> grid1, HashSet<Point> grid2)
         {
-            ans = new HashSet<string>(grid1);
+            ans = new HashSet<Point>(grid1);
             ans.IntersectWith(grid2);
 
             // THIS CODE IS SUUUUUPER SLOW (20 mins) 
@@ -200,7 +204,7 @@ namespace Day3
 
         }
 
-        private static void Plot_Grid(string[] wire, HashSet<string> grid)
+        private static void Plot_Grid(string[] wire, HashSet<Point> grid)
         {
             int
                 gridX = _ORIGIN,
@@ -217,28 +221,28 @@ namespace Day3
                         for (int i = 0; i < dist; i++)
                         {
                             gridY++;
-                            grid.Add(new string(gridX + "," + gridY));
+                            grid.Add(new Point(gridX, gridY));
                         }
                         break;
                     case "D":
                         for (int i = 0; i < dist; i++)
                         {
                             gridY--;
-                            grid.Add(new string(gridX + "," + gridY));
+                            grid.Add(new Point(gridX, gridY));
                         }
                         break;
                     case "L":
                         for (int i = 0; i < dist; i++)
                         {
                             gridX--;
-                            grid.Add(new string(gridX + "," + gridY));
+                            grid.Add(new Point(gridX, gridY));
                         }
                         break;
                     case "R":
                         for (int i = 0; i < dist; i++)
                         {
                             gridX++;
-                            grid.Add(new string(gridX + "," + gridY));
+                            grid.Add(new Point(gridX, gridY));
                         }
                         break;
                 }
