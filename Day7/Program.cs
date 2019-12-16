@@ -12,7 +12,7 @@ namespace Day7
         static string _FILE = "sample.csv";
         static ArrayList read = new ArrayList();
         static int _LARGEST = 0;
-        static int _WORKING_VAR = 0;
+        static int _INPUT = 0;
         static int[] INITIAL_OPCODE;
         static int[] WORKING_OPCODE;
 
@@ -162,13 +162,14 @@ namespace Day7
                 D_AMP = 0,
                 E_AMP = 0;
 
-            for (int i = 0; i <= THRUSTER_INPUT.Length; i++)
+            for (int i = 0; i < THRUSTER_INPUT.Length; i++)
             {
+                int[] digits = GetDigits(THRUSTER_INPUT[i]);
+
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                int[] digits = GetDigits(THRUSTER_INPUT[i]);
                 WORKING_OPCODE[1] = digits[0];
-                WORKING_OPCODE[2] = digits[4];
+                WORKING_OPCODE[2] = _INPUT;
                 Calculate_Results();
                 A_AMP = WORKING_OPCODE[0];
 
@@ -244,7 +245,7 @@ namespace Day7
                         break;
                     case 3:
                         //INPUT - TAKE INPUT & SAVE @ ADDRESS
-                        WORKING_OPCODE[WORKING_OPCODE[i + 1]] = _WORKING_VAR;
+                        WORKING_OPCODE[WORKING_OPCODE[i + 1]] = _INPUT;
                         i += 2;
                         break;
                     case 4:
