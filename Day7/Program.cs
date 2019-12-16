@@ -165,45 +165,39 @@ namespace Day7
             for (int i = 0; i < THRUSTER_INPUT.Length; i++)
             {
                 int[] digits = GetDigits(THRUSTER_INPUT[i]);
-
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[0];
-                WORKING_OPCODE[2] = _INPUT;
-                Calculate_Results();
-                A_AMP = WORKING_OPCODE[0];
+                WORKING_OPCODE[1] = digits[0];  //PHASE SETTING
+                _INPUT = 0;                     //INPUT (A = 0)
+                A_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER A --> INPUT FOR AMPLIFIER B
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[1];
-                WORKING_OPCODE[2] = A_AMP;
-                Calculate_Results();
-                B_AMP = WORKING_OPCODE[0];
+                WORKING_OPCODE[1] = digits[1];  //PHASE SETTING
+                _INPUT = A_AMP;                 //INPUT FROM A OUTPUT
+                B_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER B --> INPUT FOR AMPLIFIER C
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[2];
-                WORKING_OPCODE[2] = B_AMP;
-                Calculate_Results();
-                C_AMP = WORKING_OPCODE[0];
+                WORKING_OPCODE[1] = digits[2];  //PHASE SETTING
+                _INPUT = B_AMP;                 //INPUT FROM B OUTPUT
+                C_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER C --> INPUT FOR AMPLIFIER D
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[3];
-                WORKING_OPCODE[2] = C_AMP;
-                Calculate_Results();
-                D_AMP = WORKING_OPCODE[0];
+                WORKING_OPCODE[1] = digits[3];  //PHASE SETTING
+                _INPUT = C_AMP;                 //INPUT FROM C OUTPUT
+                D_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER D --> INPUT FOR AMPLIFIER E
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[4];
-                WORKING_OPCODE[2] = D_AMP;
-                Calculate_Results();
-                E_AMP = WORKING_OPCODE[0];
+                WORKING_OPCODE[1] = digits[4];  //PHASE SETTING
+                _INPUT = D_AMP;                 //INPUT FROM D OUTPUT
+                E_AMP = Calculate_Results();
 
                 Console.WriteLine("FINAL OUTPUT SIGNAL FROM E AMPLIFIER: {0}", E_AMP);
                 if (E_AMP > _LARGEST)
@@ -215,8 +209,9 @@ namespace Day7
             Console.WriteLine("Largest value: {0}", _LARGEST);
         }
 
-        private static void Calculate_Results()
+        private static int Calculate_Results()
         {
+            int OUTPUT = -1;
             int i = 0;
             while (i < WORKING_OPCODE.Length)
             {
@@ -250,7 +245,8 @@ namespace Day7
                         break;
                     case 4:
                         //OUTPUT - TAKE VALUE @ ADDRESS & PRINT TO SCREEN
-                        Console.WriteLine(string.Format("OUTPUTTING VALUE [{0}] @ INDEX [{1}]", WORKING_OPCODE[WORKING_OPCODE[i + 1]], i + 1));
+                        OUTPUT = WORKING_OPCODE[WORKING_OPCODE[i + 1]];
+                        Console.WriteLine(string.Format("OUTPUTTING VALUE [{0}] @ INDEX [{1}]", OUTPUT, i + 1));
                         i += 2;
                         break;
                     case 5:
@@ -305,6 +301,7 @@ namespace Day7
                         break;
                 }
             }
+            return OUTPUT;
         }
 
         private static PARAMETER_MODES[] Get_Modes(int[] opcode)
