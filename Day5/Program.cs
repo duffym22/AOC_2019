@@ -24,7 +24,7 @@ namespace Day5
             Read_Input();
             Parse_Input();
             Calculate_P1();
-            //Calculate_P2(out int noun, out int verb);
+            Calculate_P2();
 
             Console.WriteLine();
             Display_Runtime(tmr);
@@ -32,52 +32,18 @@ namespace Day5
 
         private static void Calculate_P1()
         {
-            WORKING_OPCODE = INITIAL_OPCODE;
+            WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+            Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+            _WORKING_VAR = 1;
             Calculate_Results();
         }
 
-        private static void Calculate_P2(out int noun, out int verb)
+        private static void Calculate_P2()
         {
-            bool quit = false;
-            noun = 0;
-            verb = 0;
-
-            for (int i = 0; i <= 99; i++)
-            {
-                if (!quit)
-                {
-
-                    for (int j = 0; j <= 99; j++)
-                    {
-                        if (!quit)
-                        {
-                            WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
-                            Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                            WORKING_OPCODE[1] = i;
-                            WORKING_OPCODE[2] = j;
-                            Calculate_Results();
-                            Console.WriteLine(string.Format("WORKING OPCODE | NOUN: {0} | VERB: {1} | Calc. value: {2}", WORKING_OPCODE[1], WORKING_OPCODE[2], WORKING_OPCODE[0]));
-                            if (WORKING_OPCODE[0].Equals(_EXPECTED))
-                            {
-                                Console.WriteLine(string.Format("Found expected value!"));
-                                noun = WORKING_OPCODE[1];
-                                verb = WORKING_OPCODE[2];
-                                Console.WriteLine(string.Format("NOUN: {0} | VERB: {1}", noun, verb));
-                                quit = true;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            Console.WriteLine("Final value: {0}", (100 * noun) + verb);
+            WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+            Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+            _WORKING_VAR = 5;
+            Calculate_Results();
         }
 
         private static void Calculate_Results()
