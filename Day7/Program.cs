@@ -9,10 +9,11 @@ namespace Day7
 {
     class Program
     {
-        static string _FILE = "input.csv";
+        static string _FILE = "sample.csv";
         static ArrayList read = new ArrayList();
         static int _LARGEST = 0;
-        static string _LARGEST_PHASE = "";
+        static string _LARGEST_PHASE_1 = "";
+        static string _LARGEST_PHASE_2 = "";
         static int _PHASE = 0;
         static int _INPUT = 0;
         static int[] INITIAL_OPCODE;
@@ -272,7 +273,8 @@ namespace Day7
 
             Read_Input();
             Parse_Input();
-            Calculate_P1();
+            //Calculate_P1();
+            Calculate_P2();
 
             Console.WriteLine();
             Display_Runtime(tmr);
@@ -328,10 +330,10 @@ namespace Day7
                 if (E_AMP > _LARGEST)
                 {
                     _LARGEST = E_AMP;
-                    _LARGEST_PHASE = THRUSTER_INPUT[i].ToString().Length == 4 ? string.Concat("0", THRUSTER_INPUT[i].ToString()) : THRUSTER_INPUT[i].ToString();
+                    _LARGEST_PHASE_1 = THRUSTER_INPUT[i].ToString().Length == 4 ? string.Concat("0", THRUSTER_INPUT[i].ToString()) : THRUSTER_INPUT[i].ToString();
                 }
             }
-            Console.WriteLine("HIGHEST THRUST VALUE FOUND: {0} @ SETTING {1} ", _LARGEST, _LARGEST_PHASE);
+            Console.WriteLine("HIGHEST THRUST VALUE FOUND: {0} @ SETTING {1} ", _LARGEST, _LARGEST_PHASE_1);
         }
 
         private static void Calculate_P2()
@@ -344,57 +346,61 @@ namespace Day7
                 E_AMP = 0;
 
             bool
-                FR_A_AMP = true,
-                FR_B_AMP = true,
-                FR_C_AMP = true,
-                FR_D_AMP = true,
-                FR_E_AMP = true;
+                FEEDBACK_ENABLED = false;
 
             for (int i = 0; i < THRUSTER_INPUT.Length; i++)
             {
-                int[] digits = GetDigits(THRUSTER_INPUT[i]);
-                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
-                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                _PHASE = digits[0];             //PHASE SETTING
-                _INPUT = FR_A_AMP ? 0 : E_AMP;  //INPUT (A = 0) | 
-                A_AMP = Calculate_Results();
-
-                //OUTPUT FROM AMPLIFIER A --> INPUT FOR AMPLIFIER B
-                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
-                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                _PHASE = digits[1];             //PHASE SETTING
-                _INPUT = A_AMP;                 //INPUT FROM A OUTPUT
-                B_AMP = Calculate_Results();
-
-                //OUTPUT FROM AMPLIFIER B --> INPUT FOR AMPLIFIER C
-                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
-                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                _PHASE = digits[2];             //PHASE SETTING
-                _INPUT = B_AMP;                 //INPUT FROM B OUTPUT
-                C_AMP = Calculate_Results();
-
-                //OUTPUT FROM AMPLIFIER C --> INPUT FOR AMPLIFIER D
-                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
-                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                _PHASE = digits[3];             //PHASE SETTING
-                _INPUT = C_AMP;                 //INPUT FROM C OUTPUT
-                D_AMP = Calculate_Results();
-
-                //OUTPUT FROM AMPLIFIER D --> INPUT FOR AMPLIFIER E
-                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
-                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                _PHASE = digits[4];             //PHASE SETTING
-                _INPUT = D_AMP;                 //INPUT FROM D OUTPUT
-                E_AMP = Calculate_Results();
-
-                Console.WriteLine("FINAL OUTPUT SIGNAL FROM E AMPLIFIER: {0}", E_AMP);
-                if (E_AMP > _LARGEST)
+                for (int j = 0; j < THRUSTER_INPUT_2.Length; j++)
                 {
-                    _LARGEST = E_AMP;
-                    _LARGEST_PHASE = THRUSTER_INPUT[i].ToString().Length == 4 ? string.Concat("0", THRUSTER_INPUT[i].ToString()) : THRUSTER_INPUT[i].ToString();
+                    int[] digits = GetDigits(THRUSTER_INPUT[i]);
+                    int[] digits2 = GetDigits(THRUSTER_INPUT_2[j]);
+
+                    WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                    Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                    _INPUT = FEEDBACK_ENABLED ? E_AMP : 0;                      //INPUT - FIRST INSTR = 0 | THEREAFTER: E_AMP
+                    _PHASE = FEEDBACK_ENABLED ? digits2[0] : digits[0];         //NORMAL OR FEEDBACK PHASE SETTING
+                    A_AMP = Calculate_Results();
+
+                    //OUTPUT FROM AMPLIFIER A --> INPUT FOR AMPLIFIER B
+                    WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                    Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                    _INPUT = A_AMP;                                             //INPUT FROM A OUTPUT
+                    _PHASE = FEEDBACK_ENABLED ? digits2[1] : digits[1];         //NORMAL OR FEEDBACK PHASE SETTING
+                    B_AMP = Calculate_Results();
+
+                    //OUTPUT FROM AMPLIFIER B --> INPUT FOR AMPLIFIER C
+                    WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                    Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                    _INPUT = B_AMP;                                             //INPUT FROM B OUTPUT
+                    _PHASE = FEEDBACK_ENABLED ? digits2[2] : digits[2];         //NORMAL OR FEEDBACK PHASE SETTING
+                    C_AMP = Calculate_Results();
+
+                    //OUTPUT FROM AMPLIFIER C --> INPUT FOR AMPLIFIER D
+                    WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                    Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                    _INPUT = C_AMP;                                             //INPUT FROM C OUTPUT
+                    _PHASE = FEEDBACK_ENABLED ? digits2[3] : digits[3];         //NORMAL OR FEEDBACK PHASE SETTING
+                    D_AMP = Calculate_Results();
+
+                    //OUTPUT FROM AMPLIFIER D --> INPUT FOR AMPLIFIER E
+                    WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                    Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                    _INPUT = D_AMP;                                             //INPUT FROM D OUTPUT
+                    _PHASE = FEEDBACK_ENABLED ? digits2[4] : digits[4];         //NORMAL OR FEEDBACK PHASE SETTING
+                    E_AMP = Calculate_Results();
+                    FEEDBACK_ENABLED = true;
+
+                    Console.WriteLine("FINAL OUTPUT SIGNAL FROM E AMPLIFIER: {0}", E_AMP);
+                    if (E_AMP > _LARGEST)
+                    {
+                        _LARGEST = E_AMP;
+                        _LARGEST_PHASE_1 = THRUSTER_INPUT[i].ToString().Length == 4 ? string.Concat("0", THRUSTER_INPUT[i].ToString()) : THRUSTER_INPUT[i].ToString();
+                        _LARGEST_PHASE_2 = THRUSTER_INPUT_2[j].ToString();
+                    }
                 }
+                FEEDBACK_ENABLED = false;   //once all the phase settings for the initial set have been iterated, reset the feedback boolean 
             }
-            Console.WriteLine("HIGHEST THRUST VALUE FOUND: {0} @ SETTING {1} ", _LARGEST, _LARGEST_PHASE);
+            Console.WriteLine("HIGHEST THRUST VALUE FOUND: {0} @ PH1: {1} PH2: {2}", _LARGEST, _LARGEST_PHASE_1, _LARGEST_PHASE_2);
         }
 
         private static int Calculate_Results()
