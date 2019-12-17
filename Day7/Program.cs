@@ -9,9 +9,11 @@ namespace Day7
 {
     class Program
     {
-        static string _FILE = "sample.csv";
+        static string _FILE = "input.csv";
         static ArrayList read = new ArrayList();
         static int _LARGEST = 0;
+        static string _LARGEST_PHASE = "";
+        static int _PHASE = 0;
         static int _INPUT = 0;
         static int[] INITIAL_OPCODE;
         static int[] WORKING_OPCODE;
@@ -139,6 +141,129 @@ namespace Day7
             43201,
             43210
         };
+        static int[] THRUSTER_INPUT_2 = new int[]
+        {
+            56789,
+            56798,
+            56879,
+            56897,
+            56978,
+            56987,
+            57689,
+            57698,
+            57869,
+            57896,
+            57968,
+            57986,
+            58679,
+            58697,
+            58769,
+            58796,
+            58967,
+            58976,
+            59678,
+            59687,
+            59768,
+            59786,
+            59867,
+            59876,
+            65789,
+            65798,
+            65879,
+            65897,
+            65978,
+            65987,
+            67589,
+            67598,
+            67859,
+            67895,
+            67958,
+            67985,
+            68579,
+            68597,
+            68759,
+            68795,
+            68957,
+            68975,
+            69578,
+            69587,
+            69758,
+            69785,
+            69857,
+            69875,
+            75689,
+            75698,
+            75869,
+            75896,
+            75968,
+            75986,
+            76589,
+            76598,
+            76859,
+            76895,
+            76958,
+            76985,
+            78569,
+            78596,
+            78659,
+            78695,
+            78956,
+            78965,
+            79568,
+            79586,
+            79658,
+            79685,
+            79856,
+            79865,
+            85679,
+            85697,
+            85769,
+            85796,
+            85967,
+            85976,
+            86579,
+            86597,
+            86759,
+            86795,
+            86957,
+            86975,
+            87569,
+            87596,
+            87659,
+            87695,
+            87956,
+            87965,
+            89567,
+            89576,
+            89657,
+            89675,
+            89756,
+            89765,
+            95678,
+            95687,
+            95768,
+            95786,
+            95867,
+            95876,
+            96578,
+            96587,
+            96758,
+            96785,
+            96857,
+            96875,
+            97568,
+            97586,
+            97658,
+            97685,
+            97856,
+            97865,
+            98567,
+            98576,
+            98657,
+            98675,
+            98756,
+            98765
+        };
 
         static void Main(string[] args)
         {
@@ -167,35 +292,35 @@ namespace Day7
                 int[] digits = GetDigits(THRUSTER_INPUT[i]);
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[0];  //PHASE SETTING
+                _PHASE = digits[0];             //PHASE SETTING
                 _INPUT = 0;                     //INPUT (A = 0)
                 A_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER A --> INPUT FOR AMPLIFIER B
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[1];  //PHASE SETTING
+                _PHASE = digits[1];             //PHASE SETTING
                 _INPUT = A_AMP;                 //INPUT FROM A OUTPUT
                 B_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER B --> INPUT FOR AMPLIFIER C
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[2];  //PHASE SETTING
+                _PHASE = digits[2];             //PHASE SETTING
                 _INPUT = B_AMP;                 //INPUT FROM B OUTPUT
                 C_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER C --> INPUT FOR AMPLIFIER D
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[3];  //PHASE SETTING
+                _PHASE = digits[3];             //PHASE SETTING
                 _INPUT = C_AMP;                 //INPUT FROM C OUTPUT
                 D_AMP = Calculate_Results();
 
                 //OUTPUT FROM AMPLIFIER D --> INPUT FOR AMPLIFIER E
                 WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
                 Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
-                WORKING_OPCODE[1] = digits[4];  //PHASE SETTING
+                _PHASE = digits[4];             //PHASE SETTING
                 _INPUT = D_AMP;                 //INPUT FROM D OUTPUT
                 E_AMP = Calculate_Results();
 
@@ -203,14 +328,78 @@ namespace Day7
                 if (E_AMP > _LARGEST)
                 {
                     _LARGEST = E_AMP;
-                    Console.WriteLine("HIGHER THRUST VALUE FOUND: {0}", _LARGEST);
+                    _LARGEST_PHASE = THRUSTER_INPUT[i].ToString().Length == 4 ? string.Concat("0", THRUSTER_INPUT[i].ToString()) : THRUSTER_INPUT[i].ToString();
                 }
             }
-            Console.WriteLine("Largest value: {0}", _LARGEST);
+            Console.WriteLine("HIGHEST THRUST VALUE FOUND: {0} @ SETTING {1} ", _LARGEST, _LARGEST_PHASE);
+        }
+
+        private static void Calculate_P2()
+        {
+            int
+                A_AMP = 0,
+                B_AMP = 0,
+                C_AMP = 0,
+                D_AMP = 0,
+                E_AMP = 0;
+
+            bool
+                FR_A_AMP = true,
+                FR_B_AMP = true,
+                FR_C_AMP = true,
+                FR_D_AMP = true,
+                FR_E_AMP = true;
+
+            for (int i = 0; i < THRUSTER_INPUT.Length; i++)
+            {
+                int[] digits = GetDigits(THRUSTER_INPUT[i]);
+                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                _PHASE = digits[0];             //PHASE SETTING
+                _INPUT = FR_A_AMP ? 0 : E_AMP;  //INPUT (A = 0) | 
+                A_AMP = Calculate_Results();
+
+                //OUTPUT FROM AMPLIFIER A --> INPUT FOR AMPLIFIER B
+                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                _PHASE = digits[1];             //PHASE SETTING
+                _INPUT = A_AMP;                 //INPUT FROM A OUTPUT
+                B_AMP = Calculate_Results();
+
+                //OUTPUT FROM AMPLIFIER B --> INPUT FOR AMPLIFIER C
+                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                _PHASE = digits[2];             //PHASE SETTING
+                _INPUT = B_AMP;                 //INPUT FROM B OUTPUT
+                C_AMP = Calculate_Results();
+
+                //OUTPUT FROM AMPLIFIER C --> INPUT FOR AMPLIFIER D
+                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                _PHASE = digits[3];             //PHASE SETTING
+                _INPUT = C_AMP;                 //INPUT FROM C OUTPUT
+                D_AMP = Calculate_Results();
+
+                //OUTPUT FROM AMPLIFIER D --> INPUT FOR AMPLIFIER E
+                WORKING_OPCODE = new int[INITIAL_OPCODE.Length];
+                Array.Copy(INITIAL_OPCODE, WORKING_OPCODE, INITIAL_OPCODE.Length);
+                _PHASE = digits[4];             //PHASE SETTING
+                _INPUT = D_AMP;                 //INPUT FROM D OUTPUT
+                E_AMP = Calculate_Results();
+
+                Console.WriteLine("FINAL OUTPUT SIGNAL FROM E AMPLIFIER: {0}", E_AMP);
+                if (E_AMP > _LARGEST)
+                {
+                    _LARGEST = E_AMP;
+                    _LARGEST_PHASE = THRUSTER_INPUT[i].ToString().Length == 4 ? string.Concat("0", THRUSTER_INPUT[i].ToString()) : THRUSTER_INPUT[i].ToString();
+                }
+            }
+            Console.WriteLine("HIGHEST THRUST VALUE FOUND: {0} @ SETTING {1} ", _LARGEST, _LARGEST_PHASE);
         }
 
         private static int Calculate_Results()
         {
+            bool PHASE_READ = false;
             int OUTPUT = -1;
             int i = 0;
             while (i < WORKING_OPCODE.Length)
@@ -240,7 +429,13 @@ namespace Day7
                         break;
                     case 3:
                         //INPUT - TAKE INPUT & SAVE @ ADDRESS
-                        WORKING_OPCODE[WORKING_OPCODE[i + 1]] = _INPUT;
+                        if (!PHASE_READ)
+                        {
+                            WORKING_OPCODE[WORKING_OPCODE[i + 1]] = _PHASE;
+                            PHASE_READ = true;
+                        }
+                        else
+                            WORKING_OPCODE[WORKING_OPCODE[i + 1]] = _INPUT;
                         i += 2;
                         break;
                     case 4:
